@@ -191,7 +191,7 @@ if st.button("🔍 Run Simulation") and lat is not None and lon is not None:
                     ac_hourly = outputs.get("ac", [])
                     dc_hourly = outputs.get("dc", [])
                     tz_offset = station.get("time_zone", 0)
-                    start_time = datetime(2024, 1, 1)
+                    start_time = datetime(2025, 1, 1)
                     timestamps = [start_time + timedelta(hours=i) for i in range(len(ac_hourly))]
 
                     df_hourly = pd.DataFrame({
