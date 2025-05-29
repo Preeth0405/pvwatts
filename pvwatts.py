@@ -188,8 +188,8 @@ if st.button("🔍 Run Simulation") and lat is not None and lon is not None:
                     st.dataframe(monthly_df)
 
                 elif interval == "hourly":
-                    ac_hourly = outputs.get("ac", [])
-                    dc_hourly = outputs.get("dc", [])
+                    ac_hourly = pd.Series(outputs.get("ac", []))
+                    dc_hourly = pd.Series(outputs.get("dc", []))
                     tz_offset = station.get("time_zone", 0)
                     start_time = datetime(2025, 1, 1)
                     timestamps = [start_time + timedelta(hours=i) for i in range(len(ac_hourly))]
@@ -198,7 +198,7 @@ if st.button("🔍 Run Simulation") and lat is not None and lon is not None:
                         "Timestamp": timestamps,
                         "AC Output (kWh)": ac_hourly/1000,
                         "DC Output (kWh)": dc_hourly/1000,
-                        "Specific Yield (kWh/kWp)": [round(kwh / peak_power_kw, 3) for kwh in ac_hourly]
+                        "Specific Yield (kWh/kWp)": (ac_hourly / peak_power_kw).round(3)
                     })
 
                     st.subheader("⏱️ Hourly Output Preview")
