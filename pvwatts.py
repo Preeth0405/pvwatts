@@ -196,8 +196,8 @@ if st.button("🔍 Run Simulation") and lat is not None and lon is not None:
 
                     df_hourly = pd.DataFrame({
                         "Timestamp": timestamps,
-                        "AC Output (kWh)": ac_hourly,
-                        "DC Output (kWh)": dc_hourly,
+                        "AC Output (kWh)": ac_hourly/1000,
+                        "DC Output (kWh)": dc_hourly/1000,
                         "Specific Yield (kWh/kWp)": [round(kwh / peak_power_kw, 3) for kwh in ac_hourly]
                     })
 
