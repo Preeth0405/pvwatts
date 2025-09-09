@@ -98,7 +98,7 @@ inverter_ratio = st.sidebar.number_input("DC/AC Ratio", 0.1, 2.0, 1.0, key="rati
 interval = st.sidebar.selectbox("Granularity", ["monthly", "hourly"], key="interval")
 dataset = st.sidebar.selectbox("Dataset", ["nsrdb", "tmy2", "tmy3", "intl"], key="ds")
 radius = st.sidebar.slider("Search Radius (miles)", 1, 100, 25, key="radius")
-inv = st.sidebar.number_input("Inverter Efficiency (%)", 96.0, 99.5, 96.0, 0.1, key="inv")
+inv = st.sidebar.number_input("Inverter Efficiency (%)", 96.0, 100.00, 96.0, 0.1, key="inv")
 
 # Save Input Button (only for logged in user)
 if st.sidebar.button("💾 Save Inputs to JSON"):
