@@ -9,46 +9,82 @@ from datetime import datetime, timedelta
 st.set_page_config(layout="wide")
 st.title("⚡ NREL PVWatts AC Energy Simulator")
 
-# --- Login System ---
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+with st.sidebar:
+    st.image("image.png",width = 150)
+    st.header("🔒 Secure Login")
 
-users = {"admin": hash_password("123")}
+    # Initialize session state
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
 
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
+    # Login logic
+    if not st.session_state.authenticated:
+        password = st.text_input("Enter password", type="password")
+        if password == "pushpower123":
+            st.session_state.authenticated = True
+            st.rerun()
+    else:
+        st.success("➜] Logged in")
+        if st.button("⏻ Logout"):
+            st.session_state.authenticated = False
+            st.rerun()
 
-def login():
-    with st.form("Login"):
-        st.write("🔐 Please login to access the app")
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        submit = st.form_submit_button("Login")
-
-        if submit:
-            if username in users and users[username] == hash_password(password):
-                st.session_state.authenticated = True
-                st.session_state.username = username
-                st.success("✅ Logged in successfully!")
-                st.stop()
-            else:
-                st.error("❌ Invalid credentials")
-
-def logout():
-    st.session_state.authenticated = False
-    st.session_state.username = ""
-    st.experimental_rerun()
-
-# Display login/logout
-if st.session_state.authenticated:
-    st.sidebar.write(f"👋 Logged in as {st.session_state.username}")
-    if st.sidebar.button("Logout"):
-        logout()
-else:
-    login()
+# --- Access control ---
+if not st.session_state.authenticated:
+    st.warning("Please enter the correct password to access the app.")
     st.stop()
+# --- Glossary & How-to ---
+with st.sidebar.expander("📖 Glossary & How-to", expanded=False):
+    st.markdown("""
+    ## ⚡ Key Terms
+    - **Latitude/Longitude:** Geographic coordinates of the site.
+    - **PV Size (kWp):** Installed DC capacity of the solar array.
+    - **Module Type:** 0 = Standard, 1 = Premium, 2 = Thin Film.
+    - **System Loss (%):** Aggregate losses (soiling, shading, mismatch, wiring, etc.).
+    - **Mounting Type:** Array configuration (0 = Rack, 1 = Roof, 2+ = tracking).
+    - **Tilt (°):** Angle of PV modules from horizontal.
+    - **Azimuth (°):** Direction modules face (180° = South in N Hemisphere).
+    - **DC/AC Ratio:** Oversizing of PV array relative to inverter rating.
+    - **Inverter Efficiency (%):** Conversion DC → AC.
+    - **Dataset:** Weather data source (nsrdb, tmy2, tmy3, intl).
+    - **Interval:** Monthly or hourly outputs.
+    - **Radius:** Search radius for nearest weather station.
+
+    ## 🔄 How PVWatts Works
+    1. **Solar Resource**: Selects weather data from the nearest dataset/station.
+    2. **Irradiance → DC Output**: Based on PV size, tilt, azimuth, module type.
+    3. **DC → AC Conversion**: Applies inverter efficiency and DC/AC ratio.
+    4. **System Losses**: Global % applied across all results.
+    5. **Outputs**: AC production (hourly or monthly), capacity factor, station info.
+
+    ## 🧾 Outputs Explained
+    - **Total AC Output (kWh):** Annual AC energy delivered.
+    - **Specific Yield (kWh/kWp):** Annual energy per installed kWp.
+    - **Capacity Factor (%):** Ratio of actual vs theoretical max output.
+    - **Monthly AC Output:** Seasonal variation across 12 months.
+    - **Hourly Output:** Time series for detailed analysis, e.g., load matching.
+
+    ## 📈 How to Use
+    1. **Login** with your credentials.
+    2. **Enter Location**  
+       - By coordinates, or search by address (uses OpenStreetMap).
+    3. **Set PV Parameters** in the sidebar:
+       - PV size, module type, losses, tilt/azimuth, DC/AC ratio, etc.
+    4. **Choose Dataset & Interval**:
+       - Monthly (12 values) or Hourly (~8,760 values).
+    5. **Run Simulation**:
+       - Fetches results via NREL PVWatts API.
+    6. **Review Results**:
+       - Station info, AC annual, yield, capacity factor.
+       - Monthly bar chart or hourly preview.
+    7. **Download Data** for further analysis in Excel/Python.
+
+    ## 🔌 Note
+    - **System Loss %** is critical: default is 14%. Adjust if you have site-specific losses.
+    - **DC/AC Ratio > 1.0** models PV oversizing relative to inverter.
+    - **Hourly outputs** can be large (~9k rows). Use CSV export for analysis.
+    """)
+
 
 # 📍 Location Input
 st.header("📍 Site Location Input")
